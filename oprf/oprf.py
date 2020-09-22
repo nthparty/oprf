@@ -128,4 +128,4 @@ class mask(oblivious.scalar):
         return data(_bytes=oblivious.mul(oblivious.inv(self), d))
 
 if __name__ == "__main__":
-    doctest.testmod()
+    doctest.testmod() # pragma: no cover
