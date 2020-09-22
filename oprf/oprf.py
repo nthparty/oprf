@@ -13,6 +13,15 @@ class data(oblivious.point):
     """
     Wrapper class for a bytes-like object that corresponds
     to a data data that can be masked.
+
+    >>> data('abc').hex()
+    '5a5dbd5c765abf60b2076133482c1ada189c319034ae0b933f4908b3b68d0225'
+    >>> data(bytes([123])).hex()
+    'be6f2de25b6907d7e07e6a75424c6f4bbed103c2957b9fa9fbe4fd63dfa5575b'
+    >>> data([1, 2, 3])
+    Traceback (most recent call last):
+      ...
+    TypeError: data object must be built from a string or bytes-like object
     """
 
     def __new__(cls, a=None, _bytes=None) -> data:
@@ -43,8 +52,28 @@ class mask(oblivious.scalar):
         """
         Return either a random mask or a mask corresponding
         to supplied bytes object if it is a valid scalar.
+
+        >>> (len(mask()), len(mask().hex()))
+        (32, 64)
+        >>> mask(bytes([
+        ...     183, 181, 221, 92, 201, 133, 175, 49, 189, 196, 20, 62, 112, 237, 231,
+        ...     248, 9, 156, 251, 1, 237, 58, 238, 27, 225, 61, 192, 168, 3, 119, 123, 4
+        ... ])).hex()
+        'b7b5dd5cc985af31bdc4143e70ede7f8099cfb01ed3aee1be13dc0a803777b04'
+        >>> mask(bytes([123]))
+        Traceback (most recent call last):
+          ...
+        ValueError: supplied bytes-like object is not a valid mask
+        >>> mask(bytes([123]*32))
+        Traceback (most recent call last):
+          ...
+        ValueError: supplied bytes-like object is not a valid mask
+        >>> mask([1, 2, 3])
+        Traceback (most recent call last):
+          ...
+        TypeError: mask object must be built from a bytes-like object
         """
-        if bs is not None: 
+        if bs is not None:
             if not isinstance(bs, (bytes, bytearray)):
                 raise TypeError('mask object must be built from a bytes-like object')
             if len(bs) != 32:
@@ -59,12 +88,42 @@ class mask(oblivious.scalar):
     def mask(self: mask, d: data) -> data:
         """
         Mask a value with this mask.
+
+        >>> m = mask(bytes([
+        ...     183, 181, 221, 92, 201, 133, 175, 49, 189, 196, 20, 62, 112, 237, 231,
+        ...     248, 9, 156, 251, 1, 237, 58, 238, 27, 225, 61, 192, 168, 3, 119, 123, 4
+        ... ]))
+        >>> n = mask(bytes([
+        ...     60, 242, 55, 252, 183, 112, 192, 158, 224, 1, 235, 184, 1, 203, 244, 93,
+        ...     186, 20, 154, 245, 60, 116, 11, 209, 153, 214, 144, 220, 136, 122, 161, 4
+        ... ]))
+        >>> d = data('abc')
+        >>> m.mask(d).hex()
+        '126713b2598274c5a67968b4f33b933f46f89a622c32188af11936560e886e7b'
+        >>> m.mask(n.mask(d)) == n.mask(m.mask(d))
+        True
         """
         return data(_bytes=oblivious.mul(self, d))
 
     def unmask(self: mask, d: data) -> data:
         """
         Unmask a value that has previously been masked with this mask.
+
+        >>> m = mask(bytes([
+        ...     183, 181, 221, 92, 201, 133, 175, 49, 189, 196, 20, 62, 112, 237, 231,
+        ...     248, 9, 156, 251, 1, 237, 58, 238, 27, 225, 61, 192, 168, 3, 119, 123, 4
+        ... ]))
+        >>> n = mask(bytes([
+        ...     60, 242, 55, 252, 183, 112, 192, 158, 224, 1, 235, 184, 1, 203, 244, 93,
+        ...     186, 20, 154, 245, 60, 116, 11, 209, 153, 214, 144, 220, 136, 122, 161, 4
+        ... ]))
+        >>> d = data('abc')
+        >>> m.mask(d).hex()
+        '126713b2598274c5a67968b4f33b933f46f89a622c32188af11936560e886e7b'
+        >>> d == m.unmask(m.mask(d))
+        True
+        >>> n.mask(d) == m.unmask(n.mask(m.mask(d)))
+        True
         """
         return data(_bytes=oblivious.mul(oblivious.inv(self), d))
 
