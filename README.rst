@@ -4,11 +4,14 @@ oprf
 
 Oblivious pseudo-random function (OPRF) protocol functionality implementations based on Ed25519 primitives, including both pure-Python and libsodium-based variants.
 
-|pypi|
+|pypi| |travis|
 
 .. |pypi| image:: https://badge.fury.io/py/oprf.svg
    :target: https://badge.fury.io/py/oprf
    :alt: PyPI version and link.
+
+.. |travis| image:: https://travis-ci.com/nthparty/oprf.svg?branch=master
+    :target: https://travis-ci.com/nthparty/oprf
 
 Purpose
 -------
