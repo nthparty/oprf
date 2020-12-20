@@ -11,7 +11,7 @@ Oblivious pseudo-random function (OPRF) protocol functionality implementations b
    :alt: PyPI version and link.
 
 .. |travis| image:: https://travis-ci.com/nthparty/oprf.svg?branch=master
-    :target: https://travis-ci.com/nthparty/oprf
+   :target: https://travis-ci.com/nthparty/oprf
 
 .. |coveralls| image:: https://coveralls.io/repos/github/nthparty/oprf/badge.svg?branch=master
    :target: https://coveralls.io/github/nthparty/oprf?branch=master
