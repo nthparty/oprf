@@ -1,46 +1,47 @@
-"""OPRF protocol functionalities.
+"""Basic OPRF protocol functionalities.
 
 Oblivious pseudo-random function (OPRF) protocol functionality
 implementations based on Ed25519 primitives.
 """
 
 from __future__ import annotations
+from typing import Union
 import doctest
-import hashlib
+import base64
 import oblivious
 
 class data(oblivious.point):
     """
     Wrapper class for a bytes-like object that corresponds
     to a data data that can be masked.
-
-    >>> data('abc').hex()
-    '5a5dbd5c765abf60b2076133482c1ada189c319034ae0b933f4908b3b68d0225'
-    >>> data(bytes([123])).hex()
-    'be6f2de25b6907d7e07e6a75424c6f4bbed103c2957b9fa9fbe4fd63dfa5575b'
-    >>> data([1, 2, 3])
-    Traceback (most recent call last):
-      ...
-    TypeError: data object must be built from a string or bytes-like object
     """
 
-    def __new__(cls, a=None, _bytes=None) -> data:
+    @classmethod
+    def hash(cls, argument: Union[str, bytes]) -> data: # pylint: disable=W0221
         """
-        Return data object corresponding to supplied bytes object.
+        Return data object by hashing supplied string or bytes-like object.
+
+        >>> data.hash('abc').hex()
+        '5a5dbd5c765abf60b2076133482c1ada189c319034ae0b933f4908b3b68d0225'
+        >>> data.hash(bytes([123])).hex()
+        'be6f2de25b6907d7e07e6a75424c6f4bbed103c2957b9fa9fbe4fd63dfa5575b'
+        >>> data.hash([1, 2, 3])
+        Traceback (most recent call last):
+          ...
+        TypeError: can only hash a string or bytes-like object to a data object
         """
-        # Support for constructing a data object using the
-        # raw bytes from a valid `oblivious.point` instance.
-        # This feature is not part of the public API.
-        if a is None and _bytes is not None:
-            return bytes.__new__(cls, _bytes)
+        if not isinstance(argument, (bytes, bytearray, str)):
+            raise TypeError('can only hash a string or bytes-like object to a data object')
 
-        if not isinstance(a, (bytes, bytearray, str)):
-            raise TypeError('data object must be built from a string or bytes-like object')
+        argument = argument.encode() if isinstance(argument, str) else argument
+        return bytes.__new__(cls, oblivious.point.hash(argument))
 
-        bs = a.encode() if isinstance(a, str) else a
-        bs = hashlib.sha512(bs).digest() if len(bs) != 64 else bs
-
-        return bytes.__new__(cls, oblivious.pnt(bs))
+    def __new__(cls, bs: bytes = None) -> data:
+        """
+        Return data object corresponding to supplied bytes object. No check is performed
+        to confirm that the bytes-like object is a valid point.
+        """
+        return bytes.__new__(cls, oblivious.point(bs))
 
 class mask(oblivious.scalar):
     """
@@ -48,84 +49,91 @@ class mask(oblivious.scalar):
     to a mask.
     """
 
+    @classmethod
+    def random(cls) -> mask:
+        """
+        Return random non-zero mask object.
+
+        >>> m = mask.random()
+        >>> len(m) == 32 and oblivious.scl(m) == m
+        True
+        """
+        return bytes.__new__(cls, oblivious.scalar())
+
+    @classmethod
+    def hash(cls, argument: bytes) -> mask: # pylint: disable=W0221
+        """
+        Return mask object by hashing supplied string or bytes-like object.
+
+        >>> mask.hash('abc').hex()
+        'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f200150d'
+        >>> mask.hash(bytes([123])).hex()
+        '904ea0ec29650f3b2bcf481e3ea2553488030c865aae2decba8ce7016c4e380c'
+        >>> mask.hash([1, 2, 3])
+        Traceback (most recent call last):
+          ...
+        TypeError: can only hash a string or bytes-like object to a mask object
+        """
+        if not isinstance(argument, (bytes, bytearray, str)):
+            raise TypeError('can only hash a string or bytes-like object to a mask object')
+
+        argument = argument.encode() if isinstance(argument, str) else argument
+        return bytes.__new__(cls, oblivious.scalar.hash(argument))
+
     def __new__(cls, bs: bytes = None) -> mask:
         """
-        Return either a random mask or a mask corresponding
-        to supplied bytes object if it is a valid scalar.
-
-        >>> (len(mask()), len(mask().hex()))
-        (32, 64)
-        >>> mask(bytes([
-        ...     183, 181, 221, 92, 201, 133, 175, 49, 189, 196, 20, 62, 112, 237, 231,
-        ...     248, 9, 156, 251, 1, 237, 58, 238, 27, 225, 61, 192, 168, 3, 119, 123, 4
-        ... ])).hex()
-        'b7b5dd5cc985af31bdc4143e70ede7f8099cfb01ed3aee1be13dc0a803777b04'
-        >>> mask(bytes([123]))
-        Traceback (most recent call last):
-          ...
-        ValueError: supplied bytes-like object is not a valid mask
-        >>> mask(bytes([123]*32))
-        Traceback (most recent call last):
-          ...
-        ValueError: supplied bytes-like object is not a valid mask
-        >>> mask([1, 2, 3])
-        Traceback (most recent call last):
-          ...
-        TypeError: mask object must be built from a bytes-like object
+        Return mask object corresponding to supplied bytes-like object. No check is performed
+        to confirm that the bytes-like object is a valid scalar.
         """
-        if bs is not None:
-            if not isinstance(bs, (bytes, bytearray)):
-                raise TypeError('mask object must be built from a bytes-like object')
-            if len(bs) != 32:
-                raise ValueError('supplied bytes-like object is not a valid mask')
+        return bytes.__new__(cls, oblivious.scalar(bs))
 
-        bs = oblivious.rnd() if bs is None else oblivious.scl(bs)
-        if bs is None:
-            raise ValueError('supplied bytes-like object is not a valid mask')
+    def __call__(self: mask, d: data) -> data:
+        """
+        Apply mask to data instance and return the result.
 
-        return bytes.__new__(cls, bs)
+        >>> d = data.hash('abc')
+        >>> m = mask.hash('abc')
+        >>> m(d).hex()
+        'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
+        """
+        return data(oblivious.mul(self, d))
+
+    def __invert__(self: mask) -> mask:
+        """
+        Return the inverse of the mask.
+
+        >>> m = mask.hash('abc')
+        >>> (~m).hex()
+        '9d7c69e8dded15ba20544cee233db3148481e713863ddcf0dff9d56470ba8501'
+        >>> d = data.hash('abc')
+        >>> (~m)(m(d)) == d
+        True
+        >>> m((~m)(d)) == d
+        True
+        """
+        return mask(oblivious.inv(self))
 
     def mask(self: mask, d: data) -> data:
         """
-        Mask a value with this mask.
+        Mask a data object with this mask.
 
-        >>> m = mask(bytes([
-        ...     183, 181, 221, 92, 201, 133, 175, 49, 189, 196, 20, 62, 112, 237, 231,
-        ...     248, 9, 156, 251, 1, 237, 58, 238, 27, 225, 61, 192, 168, 3, 119, 123, 4
-        ... ]))
-        >>> n = mask(bytes([
-        ...     60, 242, 55, 252, 183, 112, 192, 158, 224, 1, 235, 184, 1, 203, 244, 93,
-        ...     186, 20, 154, 245, 60, 116, 11, 209, 153, 214, 144, 220, 136, 122, 161, 4
-        ... ]))
-        >>> d = data('abc')
+        >>> d = data.hash('abc')
+        >>> m = mask.hash('abc')
         >>> m.mask(d).hex()
-        '126713b2598274c5a67968b4f33b933f46f89a622c32188af11936560e886e7b'
-        >>> m.mask(n.mask(d)) == n.mask(m.mask(d))
-        True
+        'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
         """
-        return data(_bytes=oblivious.mul(self, d))
+        return self(d)
 
     def unmask(self: mask, d: data) -> data:
         """
-        Unmask a value that has previously been masked with this mask.
+        Unmask a data object that has previously been masked with this mask.
 
-        >>> m = mask(bytes([
-        ...     183, 181, 221, 92, 201, 133, 175, 49, 189, 196, 20, 62, 112, 237, 231,
-        ...     248, 9, 156, 251, 1, 237, 58, 238, 27, 225, 61, 192, 168, 3, 119, 123, 4
-        ... ]))
-        >>> n = mask(bytes([
-        ...     60, 242, 55, 252, 183, 112, 192, 158, 224, 1, 235, 184, 1, 203, 244, 93,
-        ...     186, 20, 154, 245, 60, 116, 11, 209, 153, 214, 144, 220, 136, 122, 161, 4
-        ... ]))
-        >>> d = data('abc')
-        >>> m.mask(d).hex()
-        '126713b2598274c5a67968b4f33b933f46f89a622c32188af11936560e886e7b'
-        >>> d == m.unmask(m.mask(d))
-        True
-        >>> n.mask(d) == m.unmask(n.mask(m.mask(d)))
+        >>> d = data.hash('abc')
+        >>> m = mask.hash('abc')
+        >>> m.unmask(m(d)) == d
         True
         """
-        return data(_bytes=oblivious.mul(oblivious.inv(self), d))
+        return (~self)(d)
 
 if __name__ == "__main__":
     doctest.testmod() # pragma: no cover
