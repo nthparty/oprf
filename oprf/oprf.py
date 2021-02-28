@@ -36,12 +36,34 @@ class data(oblivious.point):
         argument = argument.encode() if isinstance(argument, str) else argument
         return bytes.__new__(cls, oblivious.point.hash(argument))
 
+    @classmethod
+    def from_base64(cls, s: str) -> data:
+        """
+        Convert Base64 UTF-8 string representation of a data instance to a data object.
+
+        >>> d = data.hash('abc')
+        >>> d_b64 = base64.standard_b64encode(d).decode('utf-8')
+        >>> data.from_base64(d_b64) == d
+        True
+        """
+        return bytes.__new__(cls, oblivious.point.from_base64(s))
+
     def __new__(cls, bs: bytes = None) -> data:
         """
         Return data object corresponding to supplied bytes object. No check is performed
         to confirm that the bytes-like object is a valid point.
         """
         return bytes.__new__(cls, oblivious.point(bs))
+
+    def to_base64(self: data) -> str:
+        """
+        Convert to equivalent Base64 UTF-8 string representation.
+
+        >>> d = data.hash('abc')
+        >>> base64.standard_b64decode(d.to_base64()) == d
+        True
+        """
+        return base64.standard_b64encode(self).decode('utf-8')
 
 class mask(oblivious.scalar):
     """
@@ -79,6 +101,18 @@ class mask(oblivious.scalar):
 
         argument = argument.encode() if isinstance(argument, str) else argument
         return bytes.__new__(cls, oblivious.scalar.hash(argument))
+
+    @classmethod
+    def from_base64(cls, s: str) -> mask:
+        """
+        Convert Base64 UTF-8 string representation of a mask instance to a mask object.
+
+        >>> m = mask.hash('abc')
+        >>> m_b64 = base64.standard_b64encode(m).decode('utf-8')
+        >>> mask.from_base64(m_b64) == m
+        True
+        """
+        return bytes.__new__(cls, oblivious.scalar.from_base64(s))
 
     def __new__(cls, bs: bytes = None) -> mask:
         """
@@ -134,6 +168,16 @@ class mask(oblivious.scalar):
         True
         """
         return (~self)(d)
+
+    def to_base64(self: mask) -> str:
+        """
+        Convert to equivalent Base64 UTF-8 string representation.
+
+        >>> m = mask.hash('abc')
+        >>> base64.standard_b64decode(m.to_base64()) == m
+        True
+        """
+        return base64.standard_b64encode(self).decode('utf-8')
 
 if __name__ == "__main__":
     doctest.testmod() # pragma: no cover
