@@ -5,9 +5,9 @@ with open("README.rst", "r") as fh:
 
 setup(
     name="oprf",
-    version="0.1.0",
+    version="1.0.0",
     packages=["oprf",],
-    install_requires=["oblivious",],
+    install_requires=["oblivious>=2.2.0",],
     license="MIT",
     url="https://github.com/nthparty/oprf",
     author="Andrei Lapets",
