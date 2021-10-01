@@ -13,7 +13,8 @@ setup(
     author="Andrei Lapets",
     author_email="a@lapets.io",
     description="Oblivious pseudo-random function (OPRF) protocol "+\
-                "functionality implementations based on Ed25519 primitives.",
+                "functionality implementations based on Curve25519 "+\
+                "primitives.",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     test_suite="nose.collector",
