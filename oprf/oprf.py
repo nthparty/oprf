@@ -1,25 +1,22 @@
-"""Basic OPRF protocol functionalities.
-
-Oblivious pseudo-random function (OPRF) protocol functionality
-implementations based on Ed25519 primitives.
 """
-
+Oblivious pseudo-random function (OPRF) protocol functionality
+implementations based on Curve25519 primitives.
+"""
 from __future__ import annotations
 from typing import Union
 import doctest
-import base64
 import oblivious
 
 class data(oblivious.point):
     """
     Wrapper class for a bytes-like object that corresponds
-    to a data data that can be masked.
+    to a piece of data that can be masked.
     """
-
     @classmethod
-    def hash(cls, argument: Union[str, bytes]) -> data: # pylint: disable=W0221
+    def hash(cls, argument: Union[str, bytes]) -> data: # pylint: disable=W0221,W0237
         """
-        Return data object by hashing supplied string or bytes-like object.
+        Return data object constructed by hashing supplied string or bytes-like
+        object.
 
         >>> data.hash('abc').hex()
         '5a5dbd5c765abf60b2076133482c1ada189c319034ae0b933f4908b3b68d0225'
@@ -31,7 +28,9 @@ class data(oblivious.point):
         TypeError: can only hash a string or bytes-like object to a data object
         """
         if not isinstance(argument, (bytes, bytearray, str)):
-            raise TypeError('can only hash a string or bytes-like object to a data object')
+            raise TypeError(
+                'can only hash a string or bytes-like object to a data object'
+            )
 
         argument = argument.encode() if isinstance(argument, str) else argument
         return bytes.__new__(cls, oblivious.point.hash(argument))
@@ -39,38 +38,50 @@ class data(oblivious.point):
     @classmethod
     def from_base64(cls, s: str) -> data:
         """
-        Convert Base64 UTF-8 string representation of a data instance to a data object.
+        Convert Base64 UTF-8 string representation of a data instance to a data
+        object.
 
         >>> d = data.hash('abc')
-        >>> d_b64 = base64.standard_b64encode(d).decode('utf-8')
-        >>> data.from_base64(d_b64) == d
+        >>> data.from_base64(d.to_base64()) == d
         True
         """
         return bytes.__new__(cls, oblivious.point.from_base64(s))
 
     def __new__(cls, bs: bytes = None) -> data:
         """
-        Return data object corresponding to supplied bytes object. No check is performed
-        to confirm that the bytes-like object is a valid point.
+        Return data object corresponding to supplied bytes-like object. No
+        checks are performed to confirm that the bytes-like object is a valid
+        representation of a data object.
         """
         return bytes.__new__(cls, oblivious.point(bs))
 
-    def to_base64(self: data) -> str:
+    def __truediv__(self: data, m: mask) -> data:
         """
-        Convert to equivalent Base64 UTF-8 string representation.
+        Unmask this data object (assuming it has previously been masked with the
+        supplied mask).
 
         >>> d = data.hash('abc')
-        >>> base64.standard_b64decode(d.to_base64()) == d
+        >>> m = mask.hash('abc')
+        >>> ((m(d)) / m) == d
         True
         """
-        return base64.standard_b64encode(self).decode('utf-8')
+        return (~m)(self)
+
+    def to_base64(self: data) -> str:
+        """
+        Convert to Base64 UTF-8 string representation.
+
+        >>> d = data.hash('abc')
+        >>> d.to_base64()
+        'Wl29XHZav2CyB2EzSCwa2hicMZA0rguTP0kIs7aNAiU='
+        """
+        return oblivious.point(self).to_base64()
 
 class mask(oblivious.scalar):
     """
     Wrapper class for a bytes-like object that corresponds
     to a mask.
     """
-
     @classmethod
     def random(cls) -> mask:
         """
@@ -83,9 +94,10 @@ class mask(oblivious.scalar):
         return bytes.__new__(cls, oblivious.scalar())
 
     @classmethod
-    def hash(cls, argument: bytes) -> mask: # pylint: disable=W0221
+    def hash(cls, argument: bytes) -> mask: # pylint: disable=W0221,W0237
         """
-        Return mask object by hashing supplied string or bytes-like object.
+        Return mask object constructed by hashing supplied string or bytes-like
+        object.
 
         >>> mask.hash('abc').hex()
         'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f200150d'
@@ -97,7 +109,9 @@ class mask(oblivious.scalar):
         TypeError: can only hash a string or bytes-like object to a mask object
         """
         if not isinstance(argument, (bytes, bytearray, str)):
-            raise TypeError('can only hash a string or bytes-like object to a mask object')
+            raise TypeError(
+                'can only hash a string or bytes-like object to a mask object'
+            )
 
         argument = argument.encode() if isinstance(argument, str) else argument
         return bytes.__new__(cls, oblivious.scalar.hash(argument))
@@ -105,32 +119,22 @@ class mask(oblivious.scalar):
     @classmethod
     def from_base64(cls, s: str) -> mask:
         """
-        Convert Base64 UTF-8 string representation of a mask instance to a mask object.
+        Convert Base64 UTF-8 string representation of a mask instance to a
+        mask object.
 
         >>> m = mask.hash('abc')
-        >>> m_b64 = base64.standard_b64encode(m).decode('utf-8')
-        >>> mask.from_base64(m_b64) == m
+        >>> mask.from_base64(m.to_base64()) == m
         True
         """
         return bytes.__new__(cls, oblivious.scalar.from_base64(s))
 
     def __new__(cls, bs: bytes = None) -> mask:
         """
-        Return mask object corresponding to supplied bytes-like object. No check is performed
-        to confirm that the bytes-like object is a valid scalar.
+        Return mask object corresponding to supplied bytes-like object. No
+        checks are performed to confirm that the bytes-like object is a valid
+        representation of a mask object.
         """
         return bytes.__new__(cls, oblivious.scalar(bs))
-
-    def __call__(self: mask, d: data) -> data:
-        """
-        Apply mask to data instance and return the result.
-
-        >>> d = data.hash('abc')
-        >>> m = mask.hash('abc')
-        >>> m(d).hex()
-        'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
-        """
-        return data(oblivious.mul(self, d))
 
     def __invert__(self: mask) -> mask:
         """
@@ -149,14 +153,36 @@ class mask(oblivious.scalar):
 
     def mask(self: mask, d: data) -> data:
         """
-        Mask a data object with this mask.
+        Mask a data object with this mask and return the masked data object.
 
         >>> d = data.hash('abc')
         >>> m = mask.hash('abc')
         >>> m.mask(d).hex()
         'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
         """
-        return self(d)
+        return data(oblivious.mul(self, d))
+
+    def __call__(self: mask, d: data) -> data:
+        """
+        Mask a data object with this mask and return the masked data object.
+
+        >>> d = data.hash('abc')
+        >>> m = mask.hash('abc')
+        >>> m(d).hex()
+        'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
+        """
+        return data(oblivious.mul(self, d))
+
+    def __mul__(self: mask, d: data) -> data:
+        """
+        Mask a data object with this mask and return the masked data object.
+
+        >>> d = data.hash('abc')
+        >>> m = mask.hash('abc')
+        >>> (m * d).hex()
+        'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
+        """
+        return data(oblivious.mul(self, d))
 
     def unmask(self: mask, d: data) -> data:
         """
@@ -171,13 +197,13 @@ class mask(oblivious.scalar):
 
     def to_base64(self: mask) -> str:
         """
-        Convert to equivalent Base64 UTF-8 string representation.
+        Convert to Base64 UTF-8 string representation.
 
         >>> m = mask.hash('abc')
-        >>> base64.standard_b64decode(m.to_base64()) == m
-        True
+        >>> m.to_base64()
+        'ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFQ0='
         """
-        return base64.standard_b64encode(self).decode('utf-8')
+        return oblivious.scalar(self).to_base64()
 
 if __name__ == "__main__":
     doctest.testmod() # pragma: no cover

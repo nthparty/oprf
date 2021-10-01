@@ -1,2 +1,2 @@
-"""Allow users to use values directly."""
+"""Gives users direct access to classes."""
 from oprf.oprf import data, mask

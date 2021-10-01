@@ -7,7 +7,7 @@ setup(
     name="oprf",
     version="1.0.0",
     packages=["oprf",],
-    install_requires=["oblivious>=2.2.0",],
+    install_requires=["oblivious~=4.0.1",],
     license="MIT",
     url="https://github.com/nthparty/oprf",
     author="Andrei Lapets",
