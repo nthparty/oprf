@@ -3,7 +3,7 @@ Oblivious pseudo-random function (OPRF) protocol functionality
 implementations based on Curve25519 primitives.
 """
 from __future__ import annotations
-from typing import Union
+from typing import Optional, Union
 import doctest
 import oblivious
 
@@ -47,7 +47,7 @@ class data(oblivious.point):
         """
         return bytes.__new__(cls, oblivious.point.from_base64(s))
 
-    def __new__(cls, bs: bytes = None) -> data:
+    def __new__(cls, bs: Optional[bytes] = None) -> data:
         """
         Return data object corresponding to supplied bytes-like object. No
         checks are performed to confirm that the bytes-like object is a valid
@@ -99,7 +99,7 @@ class mask(oblivious.scalar):
         return bytes.__new__(cls, oblivious.scalar())
 
     @classmethod
-    def hash(cls, argument: bytes) -> mask: # pylint: disable=W0221,W0237
+    def hash(cls, argument: Union[str, bytes]) -> mask: # pylint: disable=W0221,W0237
         """
         Return mask object constructed by hashing supplied string or bytes-like
         object.
@@ -133,7 +133,7 @@ class mask(oblivious.scalar):
         """
         return bytes.__new__(cls, oblivious.scalar.from_base64(s))
 
-    def __new__(cls, bs: bytes = None) -> mask:
+    def __new__(cls, bs: Optional[bytes] = None) -> mask:
         """
         Return mask object corresponding to supplied bytes-like object. No
         checks are performed to confirm that the bytes-like object is a valid
