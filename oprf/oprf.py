@@ -52,6 +52,11 @@ class data(oblivious.point):
         Return data object corresponding to supplied bytes-like object. No
         checks are performed to confirm that the bytes-like object is a valid
         representation of a data object.
+
+        >>> d = data.hash('abc')
+        >>> bs = bytes(d)
+        >>> data(bs) == d
+        True
         """
         return bytes.__new__(cls, oblivious.point(bs))
 
@@ -65,7 +70,7 @@ class data(oblivious.point):
         >>> ((m(d)) / m) == d
         True
         """
-        return (~argument)(self)
+        return data(oblivious.mul(oblivious.inv(argument), self))
 
     def to_base64(self: data) -> str:
         """
@@ -133,6 +138,11 @@ class mask(oblivious.scalar):
         Return mask object corresponding to supplied bytes-like object. No
         checks are performed to confirm that the bytes-like object is a valid
         representation of a mask object.
+
+        >>> m = mask()
+        >>> bs = bytes(m)
+        >>> mask(bs) == m
+        True
         """
         return bytes.__new__(cls, oblivious.scalar(bs))
 
@@ -193,7 +203,7 @@ class mask(oblivious.scalar):
         >>> m.unmask(m(d)) == d
         True
         """
-        return (~self)(argument)
+        return data(oblivious.mul(oblivious.inv(self), argument))
 
     def to_base64(self: mask) -> str:
         """
