@@ -55,7 +55,7 @@ class data(oblivious.point):
         """
         return bytes.__new__(cls, oblivious.point(bs))
 
-    def __truediv__(self: data, m: mask) -> data:
+    def __truediv__(self: data, argument: mask) -> data:
         """
         Unmask this data object (assuming it has previously been masked with the
         supplied mask).
@@ -65,7 +65,7 @@ class data(oblivious.point):
         >>> ((m(d)) / m) == d
         True
         """
-        return (~m)(self)
+        return (~argument)(self)
 
     def to_base64(self: data) -> str:
         """
@@ -151,7 +151,7 @@ class mask(oblivious.scalar):
         """
         return mask(oblivious.inv(self))
 
-    def mask(self: mask, d: data) -> data:
+    def mask(self: mask, argument: data) -> data:
         """
         Mask a data object with this mask and return the masked data object.
 
@@ -160,9 +160,9 @@ class mask(oblivious.scalar):
         >>> m.mask(d).hex()
         'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
         """
-        return data(oblivious.mul(self, d))
+        return data(oblivious.mul(self, argument))
 
-    def __call__(self: mask, d: data) -> data:
+    def __call__(self: mask, argument: data) -> data:
         """
         Mask a data object with this mask and return the masked data object.
 
@@ -171,9 +171,9 @@ class mask(oblivious.scalar):
         >>> m(d).hex()
         'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
         """
-        return data(oblivious.mul(self, d))
+        return data(oblivious.mul(self, argument))
 
-    def __mul__(self: mask, d: data) -> data:
+    def __mul__(self: mask, argument: data) -> data:
         """
         Mask a data object with this mask and return the masked data object.
 
@@ -182,9 +182,9 @@ class mask(oblivious.scalar):
         >>> (m * d).hex()
         'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
         """
-        return data(oblivious.mul(self, d))
+        return data(oblivious.mul(self, argument))
 
-    def unmask(self: mask, d: data) -> data:
+    def unmask(self: mask, argument: data) -> data:
         """
         Unmask a data object that has previously been masked with this mask.
 
@@ -193,7 +193,7 @@ class mask(oblivious.scalar):
         >>> m.unmask(m(d)) == d
         True
         """
-        return (~self)(d)
+        return (~self)(argument)
 
     def to_base64(self: mask) -> str:
         """
