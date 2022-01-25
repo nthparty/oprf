@@ -4,7 +4,7 @@ oprf
 
 Oblivious pseudo-random function (OPRF) protocol functionality implementations based on Curve25519 primitives, including both pure-Python and libsodium-based variants.
 
-|pypi| |readthedocs| |travis| |coveralls|
+|pypi| |readthedocs| |actions| |coveralls|
 
 .. |pypi| image:: https://badge.fury.io/py/oprf.svg
    :target: https://badge.fury.io/py/oprf
@@ -14,9 +14,9 @@ Oblivious pseudo-random function (OPRF) protocol functionality implementations b
    :target: https://oprf.readthedocs.io/en/latest/?badge=latest
    :alt: Read the Docs documentation status.
 
-.. |travis| image:: https://app.travis-ci.com/nthparty/oprf.svg?branch=main
-   :target: https://app.travis-ci.com/nthparty/oprf
-   :alt: Travis CI build status.
+.. |actions| image:: https://github.com/nthparty/oprf/workflows/lint-test-cover-docs/badge.svg
+   :target: https://github.com/nthparty/oprf/actions/workflows/lint-test-cover-docs.yml
+   :alt: GitHub Actions status.
 
 .. |coveralls| image:: https://coveralls.io/repos/github/nthparty/oprf/badge.svg?branch=main
    :target: https://coveralls.io/github/nthparty/oprf?branch=main
