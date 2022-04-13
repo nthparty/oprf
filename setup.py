@@ -5,13 +5,13 @@ with open("README.rst", "r") as fh:
 
 # The lines below are parsed by `docs/conf.py`.
 name = "oprf"
-version = "2.0.0"
+version = "3.0.0"
 
 setup(
     name=name,
     version=version,
     packages=[name,],
-    install_requires=["oblivious~=4.0.1",],
+    install_requires=["oblivious~=5.0.0",],
     license="MIT",
     url="https://github.com/nthparty/oprf",
     author="Andrei Lapets",
