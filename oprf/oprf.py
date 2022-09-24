@@ -1,6 +1,7 @@
 """
-Oblivious pseudo-random function (OPRF) protocol functionality
-implementations based on Curve25519 primitives.
+Oblivious pseudo-random function (OPRF) protocol functionality implementations
+based on `Curve25519 <https://cr.yp.to/ecdh.html>`__ and the
+`Ristretto <https://ristretto.group>`__ group.
 """
 from __future__ import annotations
 from typing import Optional, Union
@@ -9,14 +10,14 @@ import oblivious
 
 class data(oblivious.ristretto.point):
     """
-    Wrapper class for a bytes-like object that corresponds
-    to a piece of data that can be masked.
+    Wrapper class for a bytes-like object that corresponds to a piece of data
+    that can be masked.
     """
     @classmethod
-    def hash(cls, argument: Union[str, bytes]) -> data: # pylint: disable=W0221,W0237
+    def hash(cls, argument: Union[str, bytes]) -> data: # pylint: disable=arguments-renamed
         """
-        Return data object constructed by hashing supplied string or bytes-like
-        object.
+        Return data object constructed by hashing the supplied string or
+        bytes-like object.
 
         >>> data.hash('abc').hex()
         '5a5dbd5c765abf60b2076133482c1ada189c319034ae0b933f4908b3b68d0225'
@@ -49,7 +50,7 @@ class data(oblivious.ristretto.point):
 
     def __new__(cls, bs: Optional[bytes] = None) -> data:
         """
-        Return data object corresponding to supplied bytes-like object. No
+        Return data object corresponding to the supplied bytes-like object. No
         checks are performed to confirm that the bytes-like object is a valid
         representation of a data object.
 
@@ -62,8 +63,8 @@ class data(oblivious.ristretto.point):
 
     def __truediv__(self: data, argument: mask) -> data:
         """
-        Unmask this data object (assuming it has previously been masked with the
-        supplied mask).
+        Unmask this data object (assuming it has previously been masked with
+        the supplied mask).
 
         >>> d = data.hash('abc')
         >>> m = mask.hash('abc')
@@ -84,8 +85,7 @@ class data(oblivious.ristretto.point):
 
 class mask(oblivious.ristretto.scalar):
     """
-    Wrapper class for a bytes-like object that corresponds
-    to a mask.
+    Wrapper class for a bytes-like object that corresponds to a mask.
     """
     @classmethod
     def random(cls) -> mask:
@@ -99,9 +99,9 @@ class mask(oblivious.ristretto.scalar):
         return bytes.__new__(cls, oblivious.ristretto.scalar())
 
     @classmethod
-    def hash(cls, argument: Union[str, bytes]) -> mask: # pylint: disable=W0221,W0237
+    def hash(cls, argument: Union[str, bytes]) -> mask: # pylint: disable=arguments-renamed
         """
-        Return mask object constructed by hashing supplied string or bytes-like
+        Return mask object constructed by hashing the supplied string or bytes-like
         object.
 
         >>> mask.hash('abc').hex()
@@ -135,7 +135,7 @@ class mask(oblivious.ristretto.scalar):
 
     def __new__(cls, bs: Optional[bytes] = None) -> mask:
         """
-        Return mask object corresponding to supplied bytes-like object. No
+        Return mask object corresponding to the supplied bytes-like object. No
         checks are performed to confirm that the bytes-like object is a valid
         representation of a mask object.
 
@@ -148,7 +148,7 @@ class mask(oblivious.ristretto.scalar):
 
     def __invert__(self: mask) -> mask:
         """
-        Return the inverse of the mask.
+        Return the inverse of this mask instance.
 
         >>> m = mask.hash('abc')
         >>> (~m).hex()
@@ -215,5 +215,5 @@ class mask(oblivious.ristretto.scalar):
         """
         return oblivious.ristretto.scalar(self).to_base64()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     doctest.testmod() # pragma: no cover
