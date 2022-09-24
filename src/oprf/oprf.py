@@ -163,7 +163,8 @@ class mask(oblivious.ristretto.scalar):
 
     def mask(self: mask, argument: data) -> data:
         """
-        Mask a data object with this mask and return the masked data object.
+        Mask a :obj:`data` object with this mask and return the masked data
+        object.
 
         >>> d = data.hash('abc')
         >>> m = mask.hash('abc')
@@ -174,7 +175,8 @@ class mask(oblivious.ristretto.scalar):
 
     def __call__(self: mask, argument: data) -> data:
         """
-        Mask a data object with this mask and return the masked data object.
+        Mask a :obj:`data` object with this mask and return the masked data
+        object.
 
         >>> d = data.hash('abc')
         >>> m = mask.hash('abc')
@@ -185,7 +187,8 @@ class mask(oblivious.ristretto.scalar):
 
     def __mul__(self: mask, argument: data) -> data:
         """
-        Mask a data object with this mask and return the masked data object.
+        Mask a :obj:`data` object with this mask and return the masked data
+        object.
 
         >>> d = data.hash('abc')
         >>> m = mask.hash('abc')
@@ -196,7 +199,8 @@ class mask(oblivious.ristretto.scalar):
 
     def unmask(self: mask, argument: data) -> data:
         """
-        Unmask a data object that has previously been masked with this mask.
+        Unmask a :obj:`data` object that has previously been masked with this
+        mask (and return the original :obj:`data` object).
 
         >>> d = data.hash('abc')
         >>> m = mask.hash('abc')
