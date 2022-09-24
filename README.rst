@@ -63,10 +63,10 @@ Masks can also be constructed deterministically from a bytes-like object or stri
     >>> m = mask.hash('123')
 
 .. |data| replace:: ``data``
-.. _data: https://oprf.readthedocs.io/en/4.0.0/_source/oprf.oprf.data.html
+.. _data: https://oprf.readthedocs.io/en/4.0.0/_source/oprf.html#oprf.oprf.data
 
 .. |mask| replace:: ``mask``
-.. _mask: https://oprf.readthedocs.io/en/4.0.0/_source/oprf.oprf.mask.html
+.. _mask: https://oprf.readthedocs.io/en/4.0.0/_source/oprf.html#oprf.oprf.mask
 
 .. |bytes| replace:: ``bytes``
 .. _bytes: https://docs.python.org/3/library/stdtypes.html#bytes
