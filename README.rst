@@ -2,7 +2,7 @@
 oprf
 ====
 
-Oblivious pseudo-random function (OPRF) protocol functionality implementations based on Curve25519 primitives, including both pure-Python and libsodium-based variants.
+Oblivious pseudo-random function (OPRF) protocol functionality implementations based on `Curve25519 <https://cr.yp.to/ecdh.html>`__ and the `Ristretto <https://ristretto.group>`__ group.
 
 |pypi| |readthedocs| |actions| |coveralls|
 
@@ -24,11 +24,11 @@ Oblivious pseudo-random function (OPRF) protocol functionality implementations b
 
 Purpose
 -------
-This library provides data structures and methods for a basic `oblivious pseudo-random function (OPRF) <https://en.wikipedia.org/wiki/Pseudorandom_function_family>`_ protocol. Thanks to the underlying `oblivious <https://pypi.org/project/oblivious/>`_ library, users of this library have the option of relying either on pure Python implementations of cryptographic primitives or on wrappers for `libsodium <https://github.com/jedisct1/libsodium>`_.
+This library provides data structures and methods for a basic `oblivious pseudo-random function (OPRF) <https://en.wikipedia.org/wiki/Pseudorandom_function_family>`__ protocol. Thanks to the underlying `oblivious <https://pypi.org/project/oblivious>`__ library, users of this library have the option of relying either on pure-Python implementations of cryptographic primitives or on wrappers for functions defined within the `libsodium <https://github.com/jedisct1/libsodium>`__ library.
 
-Package Installation and Usage
-------------------------------
-The package is available on `PyPI <https://pypi.org/project/oprf/>`_::
+Installation and Usage
+----------------------
+This library is available as a `package on PyPI <https://pypi.org/project/oprf>`__::
 
     python -m pip install oprf
 
@@ -62,14 +62,23 @@ Masks can also be constructed deterministically from a bytes-like object or stri
 
     >>> m = mask.hash('123')
 
-Because the classes ``data`` and ``mask`` are derived from ``bytes``, `all methods and other operators <https://docs.python.org/3/library/stdtypes.html#bytes>`_ supported by ``bytes`` objects are supported by ``data`` and ``mask`` objects::
+.. |data| replace:: ``data``
+.. _data: https://oprf.readthedocs.io/en/4.0.0/_source/oprf.oprf.data.html
+
+.. |mask| replace:: ``mask``
+.. _mask: https://oprf.readthedocs.io/en/4.0.0/_source/oprf.oprf.mask.html
+
+.. |bytes| replace:: ``bytes``
+.. _bytes: https://docs.python.org/3/library/stdtypes.html#bytes
+
+Because the classes |data|_ and |mask|_ are derived from |bytes|_, `all methods and other operators <https://docs.python.org/3/library/stdtypes.html#bytes>`__ supported by |bytes|_ objects are supported by |data|_ and |mask|_ objects::
 
     >>> hex = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27a03'
     >>> m = mask.fromhex(hex)
     >>> m.hex()
     'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27a03'
 
-In addition, Base64 conversion methods are included to support concise encoding and decoding of ``data`` and ``mask`` objects::
+In addition, Base64 conversion methods are included to support concise encoding and decoding of |data|_ and |mask|_ objects::
 
     >>> d.from_base64(d.to_base64()) == d
     True
@@ -78,47 +87,52 @@ In addition, Base64 conversion methods are included to support concise encoding 
 
 Documentation
 -------------
-.. include:: toc.rst
+The documentation can be generated automatically from the source files using `Sphinx <https://www.sphinx-doc.org>`__::
 
-The documentation can be generated automatically from the source files using `Sphinx <https://www.sphinx-doc.org/>`_::
-
+    python -m pip install .[docs]
     cd docs
-    python -m pip install -r requirements.txt
-    sphinx-apidoc -f -E --templatedir=_templates -o _source .. ../setup.py && make html
+    sphinx-apidoc -f -e -E --templatedir=_templates -o _source .. && make html
 
 Testing and Conventions
 -----------------------
-All unit tests are executed and their coverage is measured when using `pytest <https://docs.pytest.org/>`_ (see ``setup.cfg`` for configuration details)::
+All unit tests are executed and their coverage is measured when using `pytest <https://docs.pytest.org>`__ (see the ``pyproject.toml`` file for configuration details)::
 
-    python -m pip install pytest pytest-cov
+    python -m pip install .[test]
     python -m pytest
 
-Alternatively, all unit tests are included in the module itself and can be executed using `doctest <https://docs.python.org/3/library/doctest.html>`_::
+Alternatively, all unit tests are included in the module itself and can be executed using `doctest <https://docs.python.org/3/library/doctest.html>`__::
 
     python oprf/oprf.py -v
 
-Style conventions are enforced using `Pylint <https://www.pylint.org/>`_::
+Style conventions are enforced using `Pylint <https://pylint.pycqa.org>`__::
 
-    python -m pip install pylint
+    python -m pip install .[lint]
     python -m pylint oprf
 
 Contributions
--------------
-In order to contribute to the source code, open an issue or submit a pull request on the `GitHub page <https://github.com/nthparty/oprf>`_ for this library.
+^^^^^^^^^^^^^
+In order to contribute to the source code, open an issue or submit a pull request on the `GitHub page <https://github.com/nthparty/oprf>`__ for this library.
 
 Versioning
-----------
-The version number format for this library and the changes to the library associated with version number increments conform with `Semantic Versioning 2.0.0 <https://semver.org/#semantic-versioning-200>`_.
+^^^^^^^^^^
+The version number format for this library and the changes to the library associated with version number increments conform with `Semantic Versioning 2.0.0 <https://semver.org/#semantic-versioning-200>`__.
 
 Publishing
-----------
-This library can be published as a `package on PyPI <https://pypi.org/project/oprf/>`_ by a package maintainer. Install the `wheel <https://pypi.org/project/wheel/>`_ package, remove any old build/distribution files, and package the source into a distribution archive::
+^^^^^^^^^^
+This library can be published as a `package on PyPI <https://pypi.org/project/oprf>`__ by a package maintainer. First, install the dependencies required for packaging and publishing::
 
-    python -m pip install wheel
-    rm -rf dist *.egg-info
-    python setup.py sdist bdist_wheel
+    python -m pip install .[publish]
 
-Next, install the `twine <https://pypi.org/project/twine/>`_ package and upload the package distribution archive to PyPI::
+Ensure that the correct version number appears in ``pyproject.toml``, and that any links in this README document to the Read the Docs documentation of this package (or its dependencies) have appropriate version numbers. Also ensure that the Read the Docs project for this library has an `automation rule <https://docs.readthedocs.io/en/stable/automation-rules.html>`__ that activates and sets as the default all tagged versions. Create and push a tag for this version (replacing ``?.?.?`` with the version number)::
 
-    python -m pip install twine
+    git tag ?.?.?
+    git push origin ?.?.?
+
+Remove any old build/distribution files. Then, package the source into a distribution archive::
+
+    rm -rf build dist *.egg-info
+    python -m build --sdist --wheel .
+
+Finally, upload the package distribution archive to `PyPI <https://pypi.org>`__::
+
     python -m twine upload dist/*
