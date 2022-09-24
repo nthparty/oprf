@@ -7,7 +7,7 @@ from typing import Optional, Union
 import doctest
 import oblivious
 
-class data(oblivious.point):
+class data(oblivious.ristretto.point):
     """
     Wrapper class for a bytes-like object that corresponds
     to a piece of data that can be masked.
@@ -33,7 +33,7 @@ class data(oblivious.point):
             )
 
         argument = argument.encode() if isinstance(argument, str) else argument
-        return bytes.__new__(cls, oblivious.point.hash(argument))
+        return bytes.__new__(cls, oblivious.ristretto.point.hash(argument))
 
     @classmethod
     def from_base64(cls, s: str) -> data:
@@ -45,7 +45,7 @@ class data(oblivious.point):
         >>> data.from_base64(d.to_base64()) == d
         True
         """
-        return bytes.__new__(cls, oblivious.point.from_base64(s))
+        return bytes.__new__(cls, oblivious.ristretto.point.from_base64(s))
 
     def __new__(cls, bs: Optional[bytes] = None) -> data:
         """
@@ -58,7 +58,7 @@ class data(oblivious.point):
         >>> data(bs) == d
         True
         """
-        return bytes.__new__(cls, oblivious.point(bs))
+        return bytes.__new__(cls, oblivious.ristretto.point(bs))
 
     def __truediv__(self: data, argument: mask) -> data:
         """
@@ -70,7 +70,7 @@ class data(oblivious.point):
         >>> ((m(d)) / m) == d
         True
         """
-        return data(oblivious.mul(oblivious.inv(argument), self))
+        return data((~argument) * self)
 
     def to_base64(self: data) -> str:
         """
@@ -80,9 +80,9 @@ class data(oblivious.point):
         >>> d.to_base64()
         'Wl29XHZav2CyB2EzSCwa2hicMZA0rguTP0kIs7aNAiU='
         """
-        return oblivious.point(self).to_base64()
+        return oblivious.ristretto.point(self).to_base64()
 
-class mask(oblivious.scalar):
+class mask(oblivious.ristretto.scalar):
     """
     Wrapper class for a bytes-like object that corresponds
     to a mask.
@@ -93,10 +93,10 @@ class mask(oblivious.scalar):
         Return random non-zero mask object.
 
         >>> m = mask.random()
-        >>> len(m) == 32 and oblivious.scl(m) == m
+        >>> len(m) == 32 and oblivious.ristretto.scalar(m) == m
         True
         """
-        return bytes.__new__(cls, oblivious.scalar())
+        return bytes.__new__(cls, oblivious.ristretto.scalar())
 
     @classmethod
     def hash(cls, argument: Union[str, bytes]) -> mask: # pylint: disable=W0221,W0237
@@ -119,7 +119,7 @@ class mask(oblivious.scalar):
             )
 
         argument = argument.encode() if isinstance(argument, str) else argument
-        return bytes.__new__(cls, oblivious.scalar.hash(argument))
+        return bytes.__new__(cls, oblivious.ristretto.scalar.hash(argument))
 
     @classmethod
     def from_base64(cls, s: str) -> mask:
@@ -131,7 +131,7 @@ class mask(oblivious.scalar):
         >>> mask.from_base64(m.to_base64()) == m
         True
         """
-        return bytes.__new__(cls, oblivious.scalar.from_base64(s))
+        return bytes.__new__(cls, oblivious.ristretto.scalar.from_base64(s))
 
     def __new__(cls, bs: Optional[bytes] = None) -> mask:
         """
@@ -144,7 +144,7 @@ class mask(oblivious.scalar):
         >>> mask(bs) == m
         True
         """
-        return bytes.__new__(cls, oblivious.scalar(bs))
+        return bytes.__new__(cls, oblivious.ristretto.scalar(bs))
 
     def __invert__(self: mask) -> mask:
         """
@@ -159,7 +159,7 @@ class mask(oblivious.scalar):
         >>> m((~m)(d)) == d
         True
         """
-        return mask(oblivious.inv(self))
+        return mask(~oblivious.ristretto.scalar(self))
 
     def mask(self: mask, argument: data) -> data:
         """
@@ -170,7 +170,7 @@ class mask(oblivious.scalar):
         >>> m.mask(d).hex()
         'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
         """
-        return data(oblivious.mul(self, argument))
+        return data(oblivious.ristretto.scalar(self) * argument)
 
     def __call__(self: mask, argument: data) -> data:
         """
@@ -181,7 +181,7 @@ class mask(oblivious.scalar):
         >>> m(d).hex()
         'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
         """
-        return data(oblivious.mul(self, argument))
+        return data(oblivious.ristretto.scalar(self) * argument)
 
     def __mul__(self: mask, argument: data) -> data:
         """
@@ -192,7 +192,7 @@ class mask(oblivious.scalar):
         >>> (m * d).hex()
         'f47c8267b28ac5100e0e97b36190e16d4533b367262557a5aa7d97b811344d15'
         """
-        return data(oblivious.mul(self, argument))
+        return data(oblivious.ristretto.scalar(self) * argument)
 
     def unmask(self: mask, argument: data) -> data:
         """
@@ -203,7 +203,7 @@ class mask(oblivious.scalar):
         >>> m.unmask(m(d)) == d
         True
         """
-        return data(oblivious.mul(oblivious.inv(self), argument))
+        return data(oblivious.ristretto.scalar(~self) * argument)
 
     def to_base64(self: mask) -> str:
         """
@@ -213,7 +213,7 @@ class mask(oblivious.scalar):
         >>> m.to_base64()
         'ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFQ0='
         """
-        return oblivious.scalar(self).to_base64()
+        return oblivious.ristretto.scalar(self).to_base64()
 
 if __name__ == "__main__":
     doctest.testmod() # pragma: no cover
