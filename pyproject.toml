@@ -13,6 +13,10 @@ authors = [
 ]
 readme = "README.rst"
 requires-python = ">=3.7"
+dependencies = [
+    "oblivious[rbcl]~=6.0"
+]
+
 
 [project.urls]
 Repository = "https://github.com/nthparty/oprf"

@@ -24,7 +24,7 @@ Oblivious pseudo-random function (OPRF) protocol functionality implementations b
 
 Purpose
 -------
-This library provides data structures and methods for a basic `oblivious pseudo-random function (OPRF) <https://en.wikipedia.org/wiki/Pseudorandom_function_family>`__ protocol. Thanks to the underlying `oblivious <https://pypi.org/project/oblivious>`__ library, users of this library have the option of relying either on pure-Python implementations of cryptographic primitives or on wrappers for functions defined within the `libsodium <https://github.com/jedisct1/libsodium>`__ library.
+This library provides data structures and methods for a basic `oblivious pseudo-random function (OPRF) <https://en.wikipedia.org/wiki/Pseudorandom_function_family>`__ protocol. Thanks to the underlying `oblivious <https://pypi.org/project/oblivious>`__ library, method implementations rely on cryptographic primitives found within the `libsodium <https://github.com/jedisct1/libsodium>`__ library.
 
 Installation and Usage
 ----------------------
@@ -85,8 +85,14 @@ In addition, Base64 conversion methods are included to support concise encoding 
     >>> m.from_base64(m.to_base64()) == m
     True
 
+Development
+-----------
+All installation and development dependencies are fully specified in ``pyproject.toml``. The ``project.optional-dependencies`` object is used to `specify optional requirements <https://peps.python.org/pep-0621>`__ for various development tasks. This makes it possible to specify additional options (such as ``docs``, ``lint``, and so on) when performing installation using `pip <https://pypi.org/project/pip>`__::
+
+    python -m pip install .[docs,lint]
+
 Documentation
--------------
+^^^^^^^^^^^^^
 The documentation can be generated automatically from the source files using `Sphinx <https://www.sphinx-doc.org>`__::
 
     python -m pip install .[docs]
@@ -94,7 +100,7 @@ The documentation can be generated automatically from the source files using `Sp
     sphinx-apidoc -f -e -E --templatedir=_templates -o _source .. && make html
 
 Testing and Conventions
------------------------
+^^^^^^^^^^^^^^^^^^^^^^^
 All unit tests are executed and their coverage is measured when using `pytest <https://docs.pytest.org>`__ (see the ``pyproject.toml`` file for configuration details)::
 
     python -m pip install .[test]
