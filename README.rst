@@ -63,10 +63,10 @@ Masks can also be constructed deterministically from a bytes-like object or stri
     >>> m = mask.hash('123')
 
 .. |data| replace:: ``data``
-.. _data: https://oprf.readthedocs.io/en/4.0.0/_source/oprf.html#oprf.oprf.data
+.. _data: https://oprf.readthedocs.io/en/5.0.0/_source/oprf.html#oprf.oprf.data
 
 .. |mask| replace:: ``mask``
-.. _mask: https://oprf.readthedocs.io/en/4.0.0/_source/oprf.html#oprf.oprf.mask
+.. _mask: https://oprf.readthedocs.io/en/5.0.0/_source/oprf.html#oprf.oprf.mask
 
 .. |bytes| replace:: ``bytes``
 .. _bytes: https://docs.python.org/3/library/stdtypes.html#bytes
@@ -97,7 +97,7 @@ The documentation can be generated automatically from the source files using `Sp
 
     python -m pip install .[docs]
     cd docs
-    sphinx-apidoc -f -e -E --templatedir=_templates -o _source .. && make html
+    sphinx-apidoc -f -E --templatedir=_templates -o _source .. && make html
 
 Testing and Conventions
 ^^^^^^^^^^^^^^^^^^^^^^^

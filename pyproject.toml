@@ -1,6 +1,6 @@
 [project]
 name = "oprf"
-version = "4.0.0"
+version = "5.0.0"
 description = """\
     Oblivious pseudo-random function (OPRF) protocol \
     functionality implementations based on Curve25519 \
@@ -16,7 +16,6 @@ requires-python = ">=3.7"
 dependencies = [
     "oblivious[rbcl]~=6.0"
 ]
-
 
 [project.urls]
 Repository = "https://github.com/nthparty/oprf"
