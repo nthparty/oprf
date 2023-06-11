@@ -4,7 +4,7 @@ based on `Curve25519 <https://cr.yp.to/ecdh.html>`__ and the
 `Ristretto <https://ristretto.group>`__ group.
 """
 from __future__ import annotations
-from typing import Optional, Union
+from typing import Union, Optional
 import doctest
 import oblivious
 
