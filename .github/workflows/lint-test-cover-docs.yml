@@ -32,7 +32,7 @@ jobs:
         run: |
           pip install -U pylint .[coveralls]
           python -m coveralls --service=github # Submit to coveralls.
-        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' && matrix.installation = 'libsodium'
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' && matrix.installation == 'libsodium'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
