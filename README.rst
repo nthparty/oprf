@@ -24,7 +24,7 @@ Oblivious pseudo-random function (OPRF) protocol functionality implementations b
 
 Purpose
 -------
-This library provides data structures and methods for a basic `oblivious pseudo-random function (OPRF) <https://en.wikipedia.org/wiki/Pseudorandom_function_family>`__ protocol. Thanks to the underlying `oblivious <https://pypi.org/project/oblivious>`__ library, method implementations rely on cryptographic primitives found within the `libsodium <https://github.com/jedisct1/libsodium>`__ library.
+This library provides data structures and methods for a basic `oblivious pseudo-random function (OPRF) <https://en.wikipedia.org/wiki/Pseudorandom_function_family>`__ protocol. Method implementations rely on cryptographic primitives involving the `Ristretto <https://ristretto.group>`__ group that are exported by the `oblivious <https://pypi.org/project/oblivious>`__ library. By default, these are wrappers for functions found in the subset of the `libsodium <https://github.com/jedisct1/libsodium>`__ library that is bundled with the `rbcl <https://pypi.org/project/rbcl>`__ library.
 
 Installation and Usage
 ----------------------
@@ -33,6 +33,13 @@ This library is available as a `package on PyPI <https://pypi.org/project/oprf>`
 .. code-block:: bash
 
     python -m pip install oprf
+
+By default, this library indirectly relies on `rbcl <https://pypi.org/project/rbcl>`__ (which bundles a subset of the `libsodium <https://github.com/jedisct1/libsodium>`__ library that is compiled for common architectures). However, it is possible to install a fully working pure-Python version of this library by installing only the pure-Python subset of the `oblivious <https://pypi.org/project/oblivious>`__ dependency (*i.e.*, within an environment where `rbcl <https://pypi.org/project/rbcl>`__ is not a required dependency of other installed packages). This approach makes it possible to use this library for rapid prototyping on exotic architectures (with the caveat that pure-Python implementations of primitives are much slower):
+
+.. code-block:: bash
+
+    python -m pip install oblivious~=7.0
+    python -m pip install oprf --no-dependencies
 
 The library can be imported in the usual ways:
 
